@@ -3,8 +3,13 @@ import org.apache.spark.sql.types._
 import sqlContext.implicits._
 
 
+//this solution is finished with Hortonworks 2.4.3 with spark 1.6.0
+
+//set the path of the file 
+val path = "file:/root/test/WeblogChallenge/data/2015_07_22_mktplace_shop_web_log_sample.log.gz"
+
 //read the file to rdd and do necessary transform
-val rdd=sc.textFile("file:/root/test/WeblogChallenge/data/2015_07_22_mktplace_shop_web_log_sample.log.gz").map(_.split(" \"|\" \"|\" ")).map(x => x(0).split(" ") ++ Array(x(1)) ++ Array(x(2)) ++ x(3).split(" "))
+val rdd=sc.textFile(path).map(_.split(" \"|\" \"|\" ")).map(x => x(0).split(" ") ++ Array(x(1)) ++ Array(x(2)) ++ x(3).split(" "))
 
 //specify the schema of each log line
 val schema = StructType("timestamp elb client_port backend_port request_processing_time backend_processing_time response_processing_time elb_status_code backend_status_code received_bytes sent_bytes request user_agent ssl_cipher ssl_protocol time".split(" ").map(x => StructField(x,StringType,true)))
@@ -96,4 +101,9 @@ val res6 = df6.join(df7, df6("request_cnt")===df7("max_request_cnt"))
 //ps: for this ip, there were 1946 request in 1 session which last 299 second, probably it use some spider to scrap data from the web.
 
 
+// Other information that are probably useful to distinguish user of the same IP :
+// 1) browser version(this log data has this information, but need to be parsed carefully)
+// 2) operation system
+// 3) Mac address of hardware(like network card)
+// 3) Mac address of hardware(like network card)
 
